@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Flame, User, TrendingUp, Bookmark, Bug } from 'lucide-react';
 
@@ -10,6 +10,7 @@ const USER_INITIALS = 'NS';
 
 export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const menuItems = [
     { icon: User, label: 'Profile', href: '#profile' },
@@ -17,6 +18,23 @@ export default function Header() {
     { icon: Bookmark, label: 'Bookmarks', href: '#bookmarks' },
     { icon: Bug, label: 'Report Bug', href: '#report' },
   ];
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   return (
     <motion.header 
@@ -58,7 +76,7 @@ export default function Header() {
           </div>
 
           {/* Right - Profile Avatar with Dropdown */}
-          <div className="relative">
+          <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-white font-semibold text-sm shadow-md hover:shadow-lg transition-shadow cursor-pointer"
