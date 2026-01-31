@@ -1,6 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Code2, Trophy } from 'lucide-react';
+import { Trophy, Flame } from 'lucide-react';
+
+// Constants
+const CURRENT_LEVEL = 7;
+const CURRENT_STREAK = 5;
 
 export default function Header() {
   return (
@@ -21,12 +25,25 @@ export default function Header() {
             TechLearn
           </a>
 
-          {/* Right side - Trophy icon for gamification */}
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-soft-bg rounded-xl">
-              <Trophy className="w-5 h-5 text-primary" />
-              <span className="text-sm font-semibold text-dark">Level 7</span>
+          {/* Center - Level and Streak */}
+          <div className="hidden sm:flex items-center gap-3">
+            {/* Level Badge */}
+            <div className="flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-xl">
+              <Trophy className="w-5 h-5 text-primary-600" />
+              <span className="text-sm font-semibold text-primary-700">Level {CURRENT_LEVEL}</span>
             </div>
+            
+            {/* Streak Indicator */}
+            <motion.div 
+              className="flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-xl cursor-pointer group"
+              whileHover={{ y: -2 }}
+              transition={{ duration: 0.2 }}
+              title="Current daily streak"
+              aria-label={`${CURRENT_STREAK} day streak`}
+            >
+              <Flame className="w-5 h-5 text-orange-500" />
+              <span className="text-sm font-semibold text-orange-600">{CURRENT_STREAK}</span>
+            </motion.div>
           </div>
         </div>
       </div>
