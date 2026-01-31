@@ -4,6 +4,7 @@ import Hero from './components/Hero';
 import QuestionCard from './components/QuestionCard';
 import CodeEditor from './components/CodeEditor';
 import OutputPanel from './components/OutputPanel';
+import Stats from './components/Stats';
 import { questionData } from './data/questionData';
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
           onSubmit={handleSubmit}
         />
         <OutputPanel output={output} />
+        <Stats />
         
         {/* Page content will go here */}
         <div className="space-y-8">
