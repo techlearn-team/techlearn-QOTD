@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import QuestionCard from './components/QuestionCard';
@@ -42,24 +43,76 @@ function App() {
     });
   };
 
+  // Stagger animation for components
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: 'easeOut',
+      },
+    },
+  };
+
   return (
     <div className="min-h-screen bg-primary-50">
       {/* Main container with max-width constraint for readability */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Header />
-        <Hero />
-        <QuestionCard question={questionData} />
-        <CodeEditor 
-          starterCode={questionData.starterCode}
-          onRunCode={handleRunCode}
-          onSubmit={handleSubmit}
-        />
-        <OutputPanel output={output} />
-        <Stats />
-        <Hint hint={questionData.hint} />
-        <Leaderboard leaders={leaderboardData} />
-        <Subscribe />
-      </div>
+      <motion.div
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants}>
+          <Header />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <Hero />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <QuestionCard question={questionData} />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <CodeEditor 
+            starterCode={questionData.starterCode}
+            onRunCode={handleRunCode}
+            onSubmit={handleSubmit}
+          />
+        </motion.div>
+        {output && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <OutputPanel output={output} />
+          </motion.div>
+        )}
+        <motion.div variants={itemVariants}>
+          <Stats />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <Hint hint={questionData.hint} />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <Leaderboard leaders={leaderboardData} />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <Subscribe />
+        </motion.div>
+      </motion.div>
     </div>
   )
 }
