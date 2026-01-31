@@ -1,7 +1,12 @@
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Trophy, Medal, Award } from 'lucide-react';
+import { leaderboardData } from '../data/leaderboard';
 
-const Leaderboard = ({ leaders }) => {
-  // Medal icons for top 3
+export default function Leaderboard() {
+  const [activeTab, setActiveTab] = useState('today');
+  const data = activeTab === 'today' ? leaderboardData.today : leaderboardData.thisWeek;
+
   const getRankIcon = (rank) => {
     switch (rank) {
       case 1:
@@ -9,71 +14,89 @@ const Leaderboard = ({ leaders }) => {
       case 2:
         return <Medal className="w-5 h-5 text-gray-400" />;
       case 3:
-        return <Award className="w-5 h-5 text-orange-400" />;
+        return <Award className="w-5 h-5 text-orange-600" />;
       default:
-        return <span className="text-sm font-semibold text-neutral-500">#{rank}</span>;
+        return <span className="text-muted font-bold">#{rank}</span>;
     }
   };
 
   return (
-    <section className="card p-6 mb-8" aria-labelledby="leaderboard-heading" role="region">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="bg-purple-100 p-2 rounded-lg">
-          <Trophy className="w-5 h-5 text-purple-600" />
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="bg-white rounded-xl p-6 shadow-soft border border-border"
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-bold text-dark">Leaderboard</h3>
+        <div className="flex gap-2 bg-soft-bg p-1 rounded-xl">
+          <button
+            onClick={() => setActiveTab('today')}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${
+              activeTab === 'today'
+                ? 'bg-white text-primary shadow-soft'
+                : 'text-muted hover:text-dark'
+            }`}
+          >
+            Today
+          </button>
+          <button
+            onClick={() => setActiveTab('thisWeek')}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${
+              activeTab === 'thisWeek'
+                ? 'bg-white text-primary shadow-soft'
+                : 'text-muted hover:text-dark'
+            }`}
+          >
+            This Week
+          </button>
         </div>
-        <h3 id="leaderboard-heading" className="text-xl font-bold text-neutral-900">Leaderboard</h3>
       </div>
 
-      {/* Leaderboard Table */}
+      {/* Leaderboard List */}
       <div className="space-y-2">
-        {leaders.map((leader, index) => (
-          <div
-            key={index}
-            className={`flex items-center justify-between p-4 rounded-lg transition-all duration-200 cursor-pointer
-              ${
-                leader.isCurrentUser
-                  ? 'bg-primary-50 border-2 border-primary-300 shadow-md'
-                  : 'bg-neutral-50 hover:bg-neutral-100 border-2 border-transparent hover:border-neutral-200'
-              }
-            `}
+        {data.map((user, index) => (
+          <motion.div
+            key={user.rank}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.05 }}
+            whileHover={{ scale: 1.02, x: 4 }}
+            className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-300 ${
+              user.isCurrentUser
+                ? 'bg-primary/10 border-2 border-primary'
+                : 'bg-soft-bg hover:bg-border'
+            }`}
           >
-            {/* Rank and Username */}
-            <div className="flex items-center gap-4 flex-1">
-              <div className="w-8 flex items-center justify-center">
-                {getRankIcon(leader.rank)}
-              </div>
-              <div>
-                <p
-                  className={`font-semibold ${
-                    leader.isCurrentUser ? 'text-primary-700' : 'text-neutral-900'
-                  }`}
-                >
-                  {leader.username}
-                  {leader.isCurrentUser && (
-                    <span className="ml-2 text-xs bg-primary-600 text-white px-2 py-0.5 rounded-full">
-                      You
-                    </span>
-                  )}
-                </p>
+            {/* Rank Icon */}
+            <div className="w-8 flex items-center justify-center">
+              {getRankIcon(user.rank)}
+            </div>
+
+            {/* Avatar */}
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
+              user.isCurrentUser
+                ? 'bg-primary text-white'
+                : 'bg-border text-dark'
+            }`}>
+              {user.avatar}
+            </div>
+
+            {/* Name */}
+            <div className="flex-1">
+              <div className={`font-semibold ${user.isCurrentUser ? 'text-primary' : 'text-dark'}`}>
+                {user.name}
               </div>
             </div>
 
-            {/* Solve Time */}
-            <div className="text-right">
-              <p className="text-sm text-neutral-600 font-medium">{leader.solveTime}</p>
+            {/* Time */}
+            <div className="font-mono font-bold text-dark">
+              {user.time}
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
-
-      {/* Motivational message */}
-      <div className="mt-6 pt-6 border-t border-neutral-200">
-        <p className="text-sm text-center text-neutral-600">
-          🏆 Keep solving daily to climb the leaderboard!
-        </p>
-      </div>
-    </section>
+    </motion.div>
   );
-};
-
-export default Leaderboard;
+}

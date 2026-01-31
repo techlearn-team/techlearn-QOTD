@@ -1,85 +1,81 @@
-import { BookOpen } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { todaysQuestion } from '../data/question';
 
-const QuestionCard = ({ question }) => {
-  const { title, difficulty, description, examples, constraints } = question;
-
-  // Difficulty badge styling
-  const difficultyColors = {
-    Easy: 'bg-green-100 text-green-700',
-    Medium: 'bg-yellow-100 text-yellow-700',
-    Hard: 'bg-red-100 text-red-700',
+export default function QuestionCard() {
+  const getDifficultyColor = (difficulty) => {
+    switch (difficulty.toLowerCase()) {
+      case 'easy':
+        return 'bg-green-100 text-green-700 border-green-200';
+      case 'medium':
+        return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'hard':
+        return 'bg-red-100 text-red-700 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
   };
 
   return (
-    <article className="card p-6 sm:p-8 mb-6 sm:mb-8" aria-labelledby="question-title">
-      {/* Question Header */}
-      <div className="flex items-start justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="bg-primary-100 p-2 rounded-lg">
-            <BookOpen className="w-5 h-5 text-primary-600" />
-          </div>
-          <h3 id="question-title" className="text-2xl font-bold text-neutral-900">{title}</h3>
-        </div>
-        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${difficultyColors[difficulty]}`}>
-          {difficulty}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ y: -2 }}
+      className="bg-white rounded-xl p-6 sm:p-8 shadow-soft-lg border border-border transition-all duration-300"
+    >
+      {/* Title and Difficulty */}
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+        <h3 className="text-2xl sm:text-3xl font-bold text-dark flex-1">
+          {todaysQuestion.title}
+        </h3>
+        <span className={`px-4 py-2 rounded-xl text-sm font-semibold border ${getDifficultyColor(todaysQuestion.difficulty)} whitespace-nowrap`}>
+          {todaysQuestion.difficulty}
         </span>
       </div>
 
-      {/* Problem Description - Notion-style spacing */}
-      <div className="prose prose-neutral max-w-none mb-6">
-        <p className="text-neutral-700 leading-relaxed whitespace-pre-line">
-          {description}
+      {/* Description */}
+      <div className="mb-6">
+        <h4 className="text-lg font-semibold text-dark mb-3">Problem Statement</h4>
+        <p className="text-muted leading-relaxed">
+          {todaysQuestion.description}
         </p>
       </div>
 
-      {/* Examples Section */}
-      {examples && examples.length > 0 && (
-        <div className="mb-6">
-          <h4 className="text-lg font-semibold text-neutral-900 mb-3">Examples</h4>
-          <div className="space-y-4">
-            {examples.map((example, index) => (
-              <div key={index} className="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
-                <p className="text-sm mb-2">
-                  <span className="font-semibold text-neutral-700">Input:</span>{' '}
-                  <code className="bg-white px-2 py-1 rounded text-primary-600 font-mono text-sm">
-                    {example.input}
-                  </code>
-                </p>
-                <p className="text-sm mb-2">
-                  <span className="font-semibold text-neutral-700">Output:</span>{' '}
-                  <code className="bg-white px-2 py-1 rounded text-primary-600 font-mono text-sm">
-                    {example.output}
-                  </code>
-                </p>
-                {example.explanation && (
-                  <p className="text-sm text-neutral-600">
-                    <span className="font-semibold">Explanation:</span> {example.explanation}
-                  </p>
-                )}
+      {/* Examples */}
+      <div className="mb-6">
+        <h4 className="text-lg font-semibold text-dark mb-3">Examples</h4>
+        <div className="space-y-4">
+          {todaysQuestion.examples.map((example, index) => (
+            <div key={index} className="bg-soft-bg rounded-xl p-4 border border-border">
+              <div className="font-mono text-sm mb-2">
+                <span className="text-muted">Input:</span>
+                <span className="text-dark ml-2">{example.input}</span>
               </div>
-            ))}
-          </div>
+              <div className="font-mono text-sm mb-2">
+                <span className="text-muted">Output:</span>
+                <span className="text-dark ml-2">{example.output}</span>
+              </div>
+              <div className="text-sm text-muted">
+                <span className="font-medium">Explanation:</span> {example.explanation}
+              </div>
+            </div>
+          ))}
         </div>
-      )}
+      </div>
 
-      {/* Constraints Section */}
-      {constraints && constraints.length > 0 && (
-        <div>
-          <h4 className="text-lg font-semibold text-neutral-900 mb-3">Constraints</h4>
-          <ul className="space-y-2">
-            {constraints.map((constraint, index) => (
-              <li key={index} className="text-sm text-neutral-700 flex items-start">
-                <span className="text-primary-500 mr-2">•</span>
-                <code className="font-mono bg-neutral-50 px-2 py-0.5 rounded text-sm">
-                  {constraint}
-                </code>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </article>
+      {/* Constraints */}
+      <div>
+        <h4 className="text-lg font-semibold text-dark mb-3">Constraints</h4>
+        <ul className="space-y-2">
+          {todaysQuestion.constraints.map((constraint, index) => (
+            <li key={index} className="flex items-start gap-2 text-muted">
+              <span className="text-primary mt-1">•</span>
+              <span className="font-mono text-sm">{constraint}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </motion.div>
   );
-};
-
-export default QuestionCard;
+}

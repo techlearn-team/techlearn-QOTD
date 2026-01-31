@@ -1,35 +1,35 @@
-import { Code2, Flame } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Code2, Trophy } from 'lucide-react';
 
-const Header = () => {
-  const currentStreak = 7; // This would come from user data in a real app
-
+export default function Header() {
   return (
-    <header className="bg-white shadow-card rounded-card p-4 sm:p-6 mb-6 sm:mb-8" role="banner">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-        {/* Brand Title and Badge */}
-        <div className="flex items-center gap-3">
-          <div className="bg-primary-600 p-2 rounded-lg">
-            <Code2 className="w-6 h-6 text-white" />
-          </div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-neutral-900">TechLearn</h1>
-            <span className="bg-primary-100 text-primary-700 text-xs font-semibold px-3 py-1 rounded-full">
-              QOTD
-            </span>
-          </div>
-        </div>
+    <motion.header 
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="bg-white/80 backdrop-blur-md border-b border-neutral-200 sticky top-0 z-50 shadow-sm"
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo Text */}
+          <a 
+            href="/"
+            className="font-bold text-xl tracking-wide bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent hover:opacity-80 transition-opacity cursor-pointer"
+            aria-label="TechLearn Home"
+          >
+            TechLearn
+          </a>
 
-        {/* Streak Indicator - encourages daily habit */}
-        <div className="flex items-center gap-2 bg-gradient-to-r from-orange-50 to-red-50 px-4 py-2 rounded-lg" aria-label="Current streak information">
-          <Flame className="w-5 h-5 text-orange-500" />
-          <div className="flex flex-col">
-            <span className="text-xs text-neutral-600 font-medium">Current Streak</span>
-            <span className="text-lg font-bold text-orange-600">{currentStreak} days</span>
+          {/* Right side - Trophy icon for gamification */}
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-soft-bg rounded-xl">
+              <Trophy className="w-5 h-5 text-primary" />
+              <span className="text-sm font-semibold text-dark">Level 7</span>
+            </div>
           </div>
         </div>
       </div>
-    </header>
+    </motion.header>
   );
-};
-
-export default Header;
+}

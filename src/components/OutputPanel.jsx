@@ -1,70 +1,99 @@
-import { CheckCircle2, XCircle, Loader2, Terminal } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { CheckCircle, XCircle, Clock, Database, TrendingUp } from 'lucide-react';
 
-const OutputPanel = ({ output }) => {
-  if (!output) return null;
-
-  const { status, message, details } = output;
-
-  // Different states: loading, success, error
-  const statusConfig = {
-    running: {
-      icon: Loader2,
-      bgColor: 'bg-primary-50',
-      borderColor: 'border-primary-200',
-      iconColor: 'text-primary-600',
-      textColor: 'text-primary-900',
-      animate: true,
-    },
-    success: {
-      icon: CheckCircle2,
-      bgColor: 'bg-green-50',
-      borderColor: 'border-green-200',
-      iconColor: 'text-green-600',
-      textColor: 'text-green-900',
-      animate: false,
-    },
-    error: {
-      icon: XCircle,
-      bgColor: 'bg-red-50',
-      borderColor: 'border-red-200',
-      iconColor: 'text-red-600',
-      textColor: 'text-red-900',
-      animate: false,
-    },
-  };
-
-  const config = statusConfig[status] || statusConfig.running;
-  const Icon = config.icon;
+export default function OutputPanel({ output }) {
+  const isSuccess = output.type === 'success';
 
   return (
-    <div className="card p-6 mb-8">
-      <div className="flex items-start gap-3 mb-4">
-        <div className="bg-neutral-800 p-2 rounded-lg">
-          <Terminal className="w-5 h-5 text-white" />
-        </div>
-        <h3 className="text-xl font-bold text-neutral-900">Output</h3>
+    <motion.div
+      initial={{ opacity: 0, y: 20, height: 0 }}
+      animate={{ opacity: 1, y: 0, height: 'auto' }}
+      transition={{ duration: 0.4 }}
+      className={`bg-white rounded-xl shadow-soft-lg border-2 overflow-hidden ${
+        isSuccess ? 'border-success' : 'border-error'
+      }`}
+    >
+      {/* Header */}
+      <div
+        className={`p-4 flex items-center gap-3 ${
+          isSuccess ? 'bg-success/10' : 'bg-error/10'
+        }`}
+      >
+        {isSuccess ? (
+          <CheckCircle className="w-6 h-6 text-success flex-shrink-0" />
+        ) : (
+          <XCircle className="w-6 h-6 text-error flex-shrink-0" />
+        )}
+        <h3 className={`font-bold text-lg ${isSuccess ? 'text-success' : 'text-error'}`}>
+          {output.message}
+        </h3>
       </div>
 
-      {/* Output Content */}
-      <div className={`${config.bgColor} ${config.borderColor} border-2 rounded-lg p-4`}>
-        <div className="flex items-start gap-3">
-          <Icon 
-            className={`w-6 h-6 ${config.iconColor} flex-shrink-0 ${config.animate ? 'animate-spin' : ''}`} 
-          />
-          <div className="flex-1">
-            <p className={`font-semibold ${config.textColor} mb-2`}>
-              {message}
-            </p>
-            {details && (
-              <pre className="bg-white rounded p-3 text-sm font-mono text-neutral-700 overflow-x-auto border border-neutral-200">
-                {details}
-              </pre>
-            )}
+      {/* Test Results */}
+      <div className="p-6 space-y-3">
+        {output.results.map((result, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.05 }}
+            className={`flex items-center justify-between p-4 rounded-xl ${
+              result.passed ? 'bg-success/5' : 'bg-error/5'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              {result.passed ? (
+                <CheckCircle className="w-5 h-5 text-success" />
+              ) : (
+                <XCircle className="w-5 h-5 text-error" />
+              )}
+              <div>
+                <div className="font-medium text-dark">{result.input}</div>
+                <div className="text-sm text-muted font-mono">{result.output}</div>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Stats (if available) */}
+      {output.stats && (
+        <div className="border-t border-border p-6 bg-soft-bg">
+          <h4 className="font-semibold text-dark mb-4">Performance Stats</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="flex items-center gap-3 bg-white p-4 rounded-xl">
+              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                <Clock className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <div className="text-sm text-muted">Runtime</div>
+                <div className="font-bold text-dark">{output.stats.runtime}</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 bg-white p-4 rounded-xl">
+              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                <Database className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <div className="text-sm text-muted">Memory</div>
+                <div className="font-bold text-dark">{output.stats.memory}</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 bg-white p-4 rounded-xl">
+              <div className="w-10 h-10 bg-success/10 rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-success" />
+              </div>
+              <div>
+                <div className="text-sm text-muted">Rank</div>
+                <div className="font-bold text-dark text-sm">{output.stats.percentile}</div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      )}
+    </motion.div>
   );
-};
-
-export default OutputPanel;
+}
