@@ -9,6 +9,7 @@ import Stats from './components/Stats';
 import Hint from './components/Hint';
 import Leaderboard from './components/Leaderboard';
 import Subscribe from './components/Subscribe';
+import Footer from './components/Footer';
 import { questionData } from './data/questionData';
 import { leaderboardData } from './data/leaderboardData';
 
@@ -113,6 +114,7 @@ function App() {
           <Subscribe />
         </motion.div>
       </motion.div>
+      <Footer />
     </div>
   )
 }
