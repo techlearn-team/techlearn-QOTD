@@ -53,17 +53,14 @@ export default function Header() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo Text */}
-          <a 
-            href="/"
-            className="font-bold text-xl tracking-wide bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent hover:opacity-70 transition-all duration-200 cursor-pointer"
-            aria-label="TechLearn Home"
-          >
-            TechLearn
-          </a>
+          {/* Left - Title Block */}
+          <div className="flex flex-col leading-tight">
+            <span className="font-bold text-xl text-neutral-900">QOTD</span>
+            <span className="text-sm text-neutral-500">Daily challenge code</span>
+          </div>
 
-          {/* Center - Level and Streak */}
-          <div className="hidden sm:flex items-center gap-3">
+          {/* Right - Status + Profile Group */}
+          <div className="flex items-center gap-3">
             {/* Level Badge */}
             <div className="flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-xl hover:bg-primary-100 transition-colors duration-200">
               <Trophy className="w-5 h-5 text-primary-600" />
@@ -71,20 +68,17 @@ export default function Header() {
             </div>
             
             {/* Streak Indicator */}
-            <motion.div 
-              className="flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-xl cursor-pointer hover:bg-orange-100"
-              whileHover={{ y: -2 }}
-              transition={{ duration: 0.2 }}
+            <div 
+              className="flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-xl hover:bg-orange-100 transition-colors duration-200 cursor-pointer"
               title="Current daily streak"
               aria-label={`${CURRENT_STREAK} day streak`}
             >
               <Flame className="w-5 h-5 text-orange-500" />
               <span className="text-sm font-semibold text-orange-600">{CURRENT_STREAK}</span>
-            </motion.div>
-          </div>
+            </div>
 
-          {/* Right - Profile Avatar with Dropdown */}
-          <div className="relative" ref={dropdownRef}>
+            {/* Profile Avatar with Dropdown */}
+            <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-white font-semibold text-sm shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2"
@@ -132,6 +126,7 @@ export default function Header() {
                 </motion.div>
               )}
             </AnimatePresence>
+            </div>
           </div>
         </div>
       </div>
