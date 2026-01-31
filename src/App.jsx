@@ -1,5 +1,7 @@
 import Header from './components/Header';
 import Hero from './components/Hero';
+import QuestionCard from './components/QuestionCard';
+import { questionData } from './data/questionData';
 
 function App() {
   return (
@@ -8,10 +10,11 @@ function App() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Header />
         <Hero />
+        <QuestionCard question={questionData} />
         
         {/* Page content will go here */}
         <div className="space-y-8">
-          <p className="text-center text-neutral-500">Component sections coming next...</p>
+          <p className="text-center text-neutral-500">More components coming next...</p>
         </div>
       </div>
     </div>
