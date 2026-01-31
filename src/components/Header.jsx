@@ -53,10 +53,18 @@ export default function Header() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Left - Title Block */}
-          <div className="flex flex-col leading-tight">
-            <span className="font-bold text-xl text-neutral-900">QOTD</span>
-            <span className="text-sm text-neutral-500">Daily challenge code</span>
+          {/* Left - Logo + Title Block */}
+          <div className="flex items-center gap-4">
+            {/* TechLearn Logo */}
+            <div className="font-bold text-blue-700 text-lg tracking-wide">
+              TechLearn
+            </div>
+            
+            {/* QOTD Title Block */}
+            <div className="flex flex-col leading-tight">
+              <span className="font-bold text-xl text-neutral-900">QOTD</span>
+              <span className="text-sm text-neutral-500">Daily challenge code</span>
+            </div>
           </div>
 
           {/* Right - Status + Profile Group */}
@@ -81,18 +89,14 @@ export default function Header() {
             <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-white font-semibold text-sm shadow-md hover:shadow-xl hover:scale-105 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2"
-              aria-label={`${USER_NAME} profile menu`}
-              aria-expanded={isDropdownOpen}
-              aria-haspopup="menu"
-              id="profile-menu"
-              title={USER_NAME}
-            >
-              {USER_INITIALS}
-            </button>
-
-            {/* Dropdown Menu */}
-            <AnimatePresence>
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-white shadow hover:shadow-lg hover:scale-105 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2"
+                aria-label="Open profile menu"
+                aria-expanded={isDropdownOpen}
+                aria-haspopup="menu"
+                id="profile-menu"
+                title={USER_NAME}
+              >
+                <User className="w-5 h-5 text-neutral-700" />
               {isDropdownOpen && (
                 <motion.div
                   initial={{ opacity: 0, y: -10, scale: 0.95 }}
