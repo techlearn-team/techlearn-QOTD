@@ -1,6 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Trophy, Flame } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Trophy, Flame, User, TrendingUp, Bookmark, Bug } from 'lucide-react';
 
 // Constants
 const CURRENT_LEVEL = 7;
@@ -9,6 +9,15 @@ const USER_NAME = 'Nikita Sachan';
 const USER_INITIALS = 'NS';
 
 export default function Header() {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const menuItems = [
+    { icon: User, label: 'Profile', href: '#profile' },
+    { icon: TrendingUp, label: 'Progress', href: '#progress' },
+    { icon: Bookmark, label: 'Bookmarks', href: '#bookmarks' },
+    { icon: Bug, label: 'Report Bug', href: '#report' },
+  ];
+
   return (
     <motion.header 
       initial={{ y: -20, opacity: 0 }}
@@ -48,14 +57,44 @@ export default function Header() {
             </motion.div>
           </div>
 
-          {/* Right - Profile Avatar */}
-          <button
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-white font-semibold text-sm shadow-md hover:shadow-lg transition-shadow cursor-pointer"
-            aria-label={`${USER_NAME} profile menu`}
-            title={USER_NAME}
-          >
-            {USER_INITIALS}
-          </button>
+          {/* Right - Profile Avatar with Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-white font-semibold text-sm shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+              aria-label={`${USER_NAME} profile menu`}
+              aria-expanded={isDropdownOpen}
+              aria-haspopup="true"
+              title={USER_NAME}
+            >
+              {USER_INITIALS}
+            </button>
+
+            {/* Dropdown Menu */}
+            <AnimatePresence>
+              {isDropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-neutral-200 overflow-hidden"
+                >
+                  {menuItems.map((item, index) => (
+                    <a
+                      key={index}
+                      href={item.href}
+                      className="flex items-center gap-3 px-4 py-3 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <item.icon className="w-4 h-4" />
+                      <span className="font-medium">{item.label}</span>
+                    </a>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </motion.header>
