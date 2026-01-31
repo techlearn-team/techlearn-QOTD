@@ -1,18 +1,26 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Clock, Tag, Zap, Lock } from 'lucide-react';
 import { todaysQuestion } from '../data/question';
 
 export default function QuestionCard() {
+  const metadata = {
+    difficulty: todaysQuestion.difficulty || 'Easy',
+    topic: 'Array',
+    time: '15–20 min',
+    xp: 20
+  };
+
   const getDifficultyColor = (difficulty) => {
     switch (difficulty.toLowerCase()) {
       case 'easy':
-        return 'bg-green-100 text-green-700 border-green-200';
+        return 'bg-green-50 text-green-700';
       case 'medium':
-        return 'bg-blue-100 text-blue-700 border-blue-200';
+        return 'bg-blue-50 text-blue-700';
       case 'hard':
-        return 'bg-red-100 text-red-700 border-red-200';
+        return 'bg-red-50 text-red-700';
       default:
-        return 'bg-gray-100 text-gray-700 border-gray-200';
+        return 'bg-gray-50 text-gray-700';
     }
   };
 
@@ -24,13 +32,33 @@ export default function QuestionCard() {
       whileHover={{ y: -2 }}
       className="bg-white rounded-xl p-6 sm:p-8 shadow-soft-lg border border-border transition-all duration-300"
     >
-      {/* Title and Difficulty */}
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
-        <h3 className="text-2xl sm:text-3xl font-bold text-dark flex-1">
+      {/* Title */}
+      <div className="mb-3">
+        <h3 className="text-2xl sm:text-3xl font-bold text-dark">
           {todaysQuestion.title}
         </h3>
-        <span className={`px-4 py-2 rounded-xl text-sm font-semibold border ${getDifficultyColor(todaysQuestion.difficulty)} whitespace-nowrap`}>
-          {todaysQuestion.difficulty}
+      </div>
+
+      {/* Metadata Strip */}
+      <div className="flex flex-wrap items-center gap-3 mb-6">
+        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(metadata.difficulty)}`}>
+          {metadata.difficulty}
+        </span>
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+          <Tag className="w-3 h-3" />
+          {metadata.topic}
+        </span>
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-neutral-50 text-neutral-700">
+          <Clock className="w-3 h-3" />
+          {metadata.time}
+        </span>
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-purple-50 text-purple-700">
+          <Zap className="w-3 h-3" />
+          +{metadata.xp} XP
+        </span>
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-gray-50 text-gray-600 opacity-75" title="Solve to unlock solution">
+          <Lock className="w-3 h-3" />
+          Solution Locked
         </span>
       </div>
 
