@@ -6,7 +6,9 @@ import CodeEditor from './components/CodeEditor';
 import OutputPanel from './components/OutputPanel';
 import Stats from './components/Stats';
 import Hint from './components/Hint';
+import Leaderboard from './components/Leaderboard';
 import { questionData } from './data/questionData';
+import { leaderboardData } from './data/leaderboardData';
 
 function App() {
   const [output, setOutput] = useState(null);
@@ -54,6 +56,7 @@ function App() {
         <OutputPanel output={output} />
         <Stats />
         <Hint hint={questionData.hint} />
+        <Leaderboard leaders={leaderboardData} />
         
         {/* Page content will go here */}
         <div className="space-y-8">
