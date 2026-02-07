@@ -1,47 +1,66 @@
-const Question = require('../models/Question');
-const Submission = require('../models/Submission');
+const Question = require("../models/Question");
+const Submission = require("../models/Submission");
 
 // @desc    Submit a solution
 // @route   POST /api/submit
 exports.submitSolution = async (req, res) => {
   try {
+    const user = req.user;
     const { questionId, userOutput } = req.body;
 
     if (!questionId || !userOutput) {
-      return res.status(400).json({ message: 'Please provide questionId and userOutput' });
+      return res.status(400).json({
+        message: "Please provide questionId and userOutput"
+      });
     }
 
-    // Explicitly select expectedOutput since it is hidden by default in the model
-    const question = await Question.findById(questionId).select('+expectedOutput');
+    // 🚫 Enforce one submission per day
+    if (user.submittedToday) {
+      return res.status(403).json({
+        message: "You have already submitted today"
+      });
+    }
+
+    // Explicitly select expectedOutput (hidden field)
+    const question = await Question.findById(questionId).select("+expectedOutput");
 
     if (!question) {
-      return res.status(404).json({ message: 'Question not found' });
+      return res.status(404).json({ message: "Question not found" });
     }
 
-    // Mock Evaluation Logic: Normalize strings (trim whitespace/newlines)
-    const isCorrect = userOutput.trim() === question.expectedOutput.trim();
-    const status = isCorrect ? 'Correct' : 'Incorrect';
+    // 🔍 Mock evaluation
+    const isCorrect =
+      userOutput.toString().trim() ===
+      question.expectedOutput.toString().trim();
 
-    // Record the submission
-    const submission = await Submission.create({
+    const status = isCorrect ? "Correct" : "Incorrect";
+
+    // 💾 Save submission (used by leaderboard)
+    await Submission.create({
+      userId: user._id,
+      userType: user.tier === "paid" ? "PAID" : "FREE",
+      userName: user.username,
       questionId,
-      userOutput,
+      difficulty: question.difficulty,
       status
     });
 
-    // Update Question Statistics (Mock Design Requirement)
-    question.attempts += 1;
-    await question.save();
+    // ✅ Mark submission done for the day
+    user.submittedToday = true;
+    await user.save();
 
-    res.status(201).json({
+    return res.status(201).json({
       success: isCorrect,
-      status: status,
-      message: isCorrect ? 'Great job! Your output matches the expected result.' : 'Output mismatch. Try again.',
-      submissionId: submission._id
+      status,
+      message: isCorrect
+        ? "Great job! Your output matches the expected result."
+        : "Output mismatch. Try again."
     });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server Error processing submission' });
+    console.error("Submit Error:", error);
+    res.status(500).json({
+      message: "Server Error processing submission"
+    });
   }
 };

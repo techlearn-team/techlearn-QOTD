@@ -1,22 +1,28 @@
 const mongoose = require('mongoose');
 
-const UserSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
-  
-  // Critical for the Assessment
-  tier: { 
-    type: String, 
-    enum: ['free', 'paid'], 
-    default: 'free' 
+const UserSchema = new mongoose.Schema(
+  {
+    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+
+    // Critical for Assessment
+    tier: {
+      type: String,
+      enum: ['free', 'paid'],
+      default: 'free'
+    },
+
+    // Usage Tracking
+    runsUsedToday: { type: Number, default: 0 },
+    submittedToday: { type: Boolean, default: false },
+
+    // Lazy Reset (YYYY-MM-DD)
+    lastActiveDate: {
+      type: String,
+      default: () => new Date().toISOString().split('T')[0]
+    }
   },
-  
-  // Usage Tracking
-  runsUsedToday: { type: Number, default: 0 },
-  submittedToday: { type: Boolean, default: false },
-  
-  // For "Lazy Reset" Logic
-  lastActiveDate: { type: String } // Stored as "YYYY-MM-DD"
-});
+  { timestamps: true }
+);
 
 module.exports = mongoose.model('User', UserSchema);
