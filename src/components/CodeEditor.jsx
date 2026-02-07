@@ -1,233 +1,187 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Play, Send, ChevronDown, Loader2 } from 'lucide-react';
-import OutputPanel from './OutputPanel';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import OutputPanel from "./OutputPanel";
+
+// ✅ SINGLE SOURCE OF TRUTH
+const USER_ID = "69876e1b50a617bdce92d4a3";
 
 const LANGUAGES = [
-  "C++",
-  "Java",
-  "Python3",
-  "Python",
   "JavaScript",
-  "TypeScript",
+  "Python",
+  "Python3",
+  "Java",
+  "C++",
+  "C",
   "C#",
-  "C"
+  "TypeScript"
 ];
 
-const MOCK_TEMPLATES = {
-  JavaScript: `
-function twoSum(arr, target) {
-  console.log("JS mode");
-  return [];
-}`,
-
-  TypeScript: 
-`function twoSum(arr: number[], target: number): number[] {
-  console.log("TS mode");
-  return [];
-}`,
-
-  Python: 
-`def two_sum(arr, target):
-    print("Python mode")
-    return []`,
-
-  Python3: 
-`def two_sum(arr, target):
-    print("Python3 mode")
-    return []`,
-
-  Java: 
-`class Solution {
-  public int[] twoSum(int[] arr, int target) {
-    System.out.println("Java mode");
-    return new int[]{};
-  }
-}`,
-
-  "C++": 
-`#include <iostream>
-using namespace std;
-
-vector<int> twoSum(...) {
-  cout << "C++ mode";
-}`,
-
-  C: 
-`#include <stdio.h>
-
-int* twoSum(...) {
-  printf("C mode");
-}`,
-
-  "C#": 
-`class Solution {
-  int[] TwoSum(...) {
-    Console.WriteLine("C# mode");
-  }
-}`
+const TEMPLATES = {
+  JavaScript: "// Write your solution here\nconsole.log('Hello QOTD');",
+  Python: "# Execution simulated\nprint('Hello QOTD')",
+  Python3: "# Execution simulated\nprint('Hello QOTD')",
+  Java: "// Execution simulated\nclass Solution {}",
+  "C++": "// Execution simulated\n#include <bits/stdc++.h>",
+  C: "// Execution simulated\n#include <stdio.h>",
+  "C#": "// Execution simulated\nclass Solution {}",
+  TypeScript: "// Execution simulated\nconsole.log('Hello QOTD');"
 };
 
-export default function CodeEditor() {
-  const [language, setLanguage] = useState('JavaScript');
-  const [code, setCode] = useState(MOCK_TEMPLATES.JavaScript);
+export default function CodeEditor({ question }) {
+  const [language, setLanguage] = useState("JavaScript");
+  const [code, setCode] = useState(TEMPLATES.JavaScript);
   const [isRunning, setIsRunning] = useState(false);
   const [output, setOutput] = useState(null);
   const [showResults, setShowResults] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
-  const handleLanguageSelect = (lang) => {
-    setLanguage(lang);
-    setCode(MOCK_TEMPLATES[lang]);
+  useEffect(() => {
+    setCode(TEMPLATES[language]);
+  }, [language]);
+
+  // ---------------- RUN ----------------
+  const handleRunCode = async () => {
+    try {
+      setIsRunning(true);
+      setShowResults(true);
+
+      const res = await fetch("http://localhost:5000/api/run", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": USER_ID
+        },
+        body: JSON.stringify({
+          language,
+          code,
+          questionId: question._id
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setOutput({
+          type: "error",
+          message: data.error || "Run failed",
+          results: []
+        });
+        return;
+      }
+
+      setOutput({
+        type: "success",
+        message: "Run successful",
+        results: data.results || []
+      });
+    } catch {
+      setOutput({
+        type: "error",
+        message: "Server error during run",
+        results: []
+      });
+    } finally {
+      setIsRunning(false);
+    }
   };
 
-  const handleRunCode = () => {
-    setIsRunning(true);
-    setOutput(null);
-    setShowResults(true);
+  // ---------------- SUBMIT ----------------
+  const handleSubmit = async () => {
+    if (submitted) return;
 
-    // Simulate code execution
-    setTimeout(() => {
-      setIsRunning(false);
+    try {
+      setIsRunning(true);
+      setShowResults(true);
+
+      const res = await fetch("http://localhost:5000/api/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": USER_ID   // ✅ FIXED
+        },
+        body: JSON.stringify({
+          questionId: question._id,
+          userOutput: question.sampleOutput // mock evaluation
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setOutput({
+          type: "error",
+          message: data.message || "Submission failed",
+          results: []
+        });
+        return;
+      }
+
+      setSubmitted(true);
       setOutput({
-        type: 'success',
-        message: 'Code executed successfully!',
+        type: data.success ? "success" : "error",
+        message: data.message,
         results: [
-          { input: '[1, 3, 5, 7, 11], target = 8', output: '[2, 3]', passed: true },
-          { input: '[2, 4, 6, 8], target = 10', output: '[2, 4]', passed: true },
-          { input: '[-1, 0, 3, 5, 9, 12], target = 4', output: '[2, 4]', passed: true }
+          {
+            input: question.sampleInput,
+            output: question.sampleOutput,
+            passed: data.success
+          }
         ]
       });
-    }, 1500);
-  };
-
-  const handleSubmit = () => {
-    setIsRunning(true);
-    setOutput(null);
-    setShowResults(true);
-
-    // Simulate submission
-    setTimeout(() => {
-      setIsRunning(false);
+    } catch {
       setOutput({
-        type: 'success',
-        message: 'All test cases passed! 🎉',
-        results: [
-          { input: 'Test Case 1', output: 'Passed', passed: true },
-          { input: 'Test Case 2', output: 'Passed', passed: true },
-          { input: 'Test Case 3', output: 'Passed', passed: true },
-          { input: 'Hidden Test Case 1', output: 'Passed', passed: true },
-          { input: 'Hidden Test Case 2', output: 'Passed', passed: true }
-        ],
-        stats: {
-          runtime: '42ms',
-          memory: '12.3MB',
-          percentile: 'Beats 87% of submissions'
-        }
+        type: "error",
+        message: "Server error during submission",
+        results: []
       });
-    }, 2000);
-  };
-
-  const getLineNumbers = () => {
-    const lines = code.split('\n').length;
-    return Array.from({ length: lines }, (_, i) => i + 1);
+    } finally {
+      setIsRunning(false);
+    }
   };
 
   return (
-    <div className="flex flex-col flex-1 w-full space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="bg-white rounded-xl shadow-sm hover:shadow-md border border-border overflow-hidden flex flex-col transition-shadow duration-200"
-      >
-        {/* Editor Header */}
-        <div className="bg-soft-bg border-b border-border p-4 flex items-center justify-between">
-          <h3 className="font-semibold text-dark">Code Editor</h3>
-          
-          {/* Language Selector */}
-          <div className="relative">
-            <select
-              value={language}
-              onChange={(e) => handleLanguageSelect(e.target.value)}
-              className="appearance-none bg-white border border-border rounded-xl px-4 py-2 pr-10 font-semibold text-sm text-dark cursor-pointer hover:border-primary transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-              aria-label="Select programming language"
-            >
-              {LANGUAGES.map((lang) => (
-                <option key={lang} value={lang}>{lang}</option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
-          </div>
-        </div>
+    <div className="space-y-6">
+      <motion.div className="bg-white rounded-xl border overflow-hidden">
+        <div className="p-4 flex justify-between items-center bg-soft-bg border-b">
+          <h3 className="font-semibold">Code Editor</h3>
 
-        {/* Code Area with Line Numbers */}
-        <div className="flex bg-[#1e1e1e] text-[#d4d4d4] font-mono text-sm min-h-[320px] sm:min-h-[420px]">
-          {/* Line Numbers */}
-          <div className="bg-[#1e1e1e] py-4 px-3 border-r border-[#3e3e3e] select-none">
-            {getLineNumbers().map((num) => (
-              <div key={num} className="text-[#858585] text-right leading-6">
-                {num}
-              </div>
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className="border rounded px-3 py-1"
+          >
+            {LANGUAGES.map((lang) => (
+              <option key={lang}>{lang}</option>
             ))}
-          </div>
-
-          {/* Code Input */}
-          <textarea
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            className="flex-1 p-4 bg-transparent resize-none focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 leading-6 code-editor font-mono caret-white"
-            spellCheck={false}
-            placeholder="// Write your code here..."
-            aria-label="Code editor"
-          />
+          </select>
         </div>
 
-        {/* Action Buttons */}
-        <div className="bg-soft-bg border-t border-border p-4 flex flex-col sm:flex-row gap-3">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+        <textarea
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          className="w-full min-h-[300px] p-4 font-mono bg-[#1e1e1e] text-white"
+        />
+
+        <div className="p-4 flex gap-3 bg-soft-bg border-t">
+          <button
             onClick={handleRunCode}
             disabled={isRunning}
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-soft-bg border-2 border-primary text-primary font-semibold rounded-xl hover:bg-primary/5 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-blue-500 cursor-pointer"
-            aria-label="Run code"
+            className="flex-1 border border-primary text-primary py-2 rounded disabled:opacity-50"
           >
-            {isRunning ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Play className="w-5 h-5" />
-            )}
-            Run Code
-          </motion.button>
+            Run
+          </button>
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <button
             onClick={handleSubmit}
-            disabled={isRunning}
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-hover hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-blue-500 cursor-pointer"
-            aria-label="Submit solution"
+            disabled={isRunning || submitted}
+            className="flex-1 bg-primary text-white py-2 rounded disabled:opacity-50"
           >
-            {isRunning ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Send className="w-5 h-5" />
-            )}
-            Submit Solution
-          </motion.button>
+            {submitted ? "Submitted" : "Submit"}
+          </button>
         </div>
       </motion.div>
 
-      {/* Output Panel */}
-      {showResults && output && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <OutputPanel output={output} />
-        </motion.div>
-      )}
+      {showResults && output && <OutputPanel output={output} />}
     </div>
   );
 }

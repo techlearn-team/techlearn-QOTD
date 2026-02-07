@@ -1,71 +1,67 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import Header from '../components/Header';
-import Hero from '../components/Hero';
-import QuestionCard from '../components/QuestionCard';
-import CodeEditor from '../components/CodeEditor';
-import StatsCard from '../components/StatsCard';
-import HintBox from '../components/HintBox';
-import Leaderboard from '../components/Leaderboard';
-import SubscribeCTA from '../components/SubscribeCTA';
-import { dailyStats } from '../data/stats';
+import React, { useEffect, useState } from "react";
+import Header from "../components/Header";
+import Hero from "../components/Hero";
+import QuestionCard from "../components/QuestionCard";
+import CodeEditor from "../components/CodeEditor";
+import HintBox from "../components/HintBox";
+import Leaderboard from "../components/Leaderboard";
+import SubscribeCTA from "../components/SubscribeCTA";
+import ViewSolution from "../components/ViewSolution";
+import StatsCard from "../components/StatsCard";
 
 export default function QOTD() {
+  const [question, setQuestion] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchQOTD = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/qotd");
+        const data = await res.json();
+        setQuestion(data);
+      } catch (err) {
+        console.error("Failed to fetch QOTD", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQOTD();
+  }, []);
+
+  if (loading) {
+    return <div className="p-8">Loading Question...</div>;
+  }
+
+  if (!question) {
+    return <div className="p-8 text-red-500">Failed to load question</div>;
+  }
+
   return (
     <div className="min-h-screen bg-soft-bg">
       <Header />
       <Hero />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
-        {/* Question Card */}
-        <QuestionCard />
+      <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        <QuestionCard question={question} />
 
-        {/* Stats Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {dailyStats.map((stat, index) => (
-            <StatsCard key={index} {...stat} index={index} />
-          ))}
-        </div>
-
-        {/* Main Content: Code Editor + Sidebar */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Code Editor - Takes 2 columns on large screens */}
           <div className="lg:col-span-2">
-            <CodeEditor />
+            <CodeEditor question={question} />
           </div>
 
-          {/* Sidebar - Takes 1 column on large screens */}
           <div className="space-y-8">
-            <HintBox />
-            <Leaderboard />
+            <HintBox question={question} />
+            <Leaderboard difficulty={question.difficulty} />
+
+            {/* 🔐 Paid-only features */}
+            <ViewSolution questionId={question._id} />
+            <StatsCard />
           </div>
         </div>
 
-        {/* Subscribe CTA */}
         <SubscribeCTA />
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-border bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-muted text-sm">
-              © 2026 QOTD. Build your coding muscle, one day at a time.
-            </p>
-            <div className="flex gap-6 text-sm text-muted">
-              <a href="#" className="hover:text-primary transition-colors duration-300">
-                About
-              </a>
-              <a href="#" className="hover:text-primary transition-colors duration-300">
-                Privacy
-              </a>
-              <a href="#" className="hover:text-primary transition-colors duration-300">
-                Contact
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

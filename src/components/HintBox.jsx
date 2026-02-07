@@ -1,17 +1,24 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Unlock, Lightbulb } from 'lucide-react';
-import { todaysQuestion } from '../data/question';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Lock, Unlock, Lightbulb } from "lucide-react";
 
-export default function HintBox() {
+export default function HintBox({ hints = [] }) {
   const [isRevealed, setIsRevealed] = useState(false);
+
+  if (!hints || hints.length === 0) {
+    return (
+      <div className="bg-white rounded-xl p-6 border border-border text-muted">
+        No hints available for this question.
+      </div>
+    );
+  }
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md border border-border transition-shadow duration-200"
+      className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md border border-border"
     >
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
@@ -30,18 +37,15 @@ export default function HintBox() {
               exit={{ opacity: 0 }}
               className="text-center py-8"
             >
-              <div className="mb-4">
-                <Lock className="w-12 h-12 text-muted mx-auto" />
-              </div>
+              <Lock className="w-12 h-12 text-muted mx-auto mb-4" />
               <p className="text-muted mb-4">
-                Try solving it on your own first. Hints can help when you're stuck!
+                Try solving it on your own first. Use hints only if you're stuck.
               </p>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsRevealed(true)}
-                className="px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary-hover hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center gap-2 mx-auto cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500"
-                aria-label="Reveal hint"
+                className="px-6 py-3 bg-primary text-white rounded-xl font-semibold flex items-center gap-2 mx-auto focus-visible:ring-2 focus-visible:ring-blue-500"
               >
                 <Unlock className="w-4 h-4" />
                 Reveal Hint
@@ -53,14 +57,14 @@ export default function HintBox() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
-              className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6"
+              className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 space-y-3"
             >
-              <div className="flex items-start gap-3">
-                <Lightbulb className="w-5 h-5 text-yellow-600 mt-1 flex-shrink-0" />
-                <p className="text-dark leading-relaxed">
-                  {todaysQuestion.hint}
-                </p>
-              </div>
+              {hints.map((hint, index) => (
+                <div key={index} className="flex gap-3">
+                  <Lightbulb className="w-5 h-5 text-yellow-600 mt-1" />
+                  <p className="text-dark leading-relaxed">{hint}</p>
+                </div>
+              ))}
             </motion.div>
           )}
         </AnimatePresence>
