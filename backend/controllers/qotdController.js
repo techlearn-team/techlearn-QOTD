@@ -10,13 +10,37 @@ exports.getDailyQuestion = async (req, res) => {
     }
 
     // 2. Deterministic Daily Logic
-    // This picks a question based on the date so it changes every 24 hours
-    const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+    // Uses server time to ensure everyone sees the same question
+    const today = new Date();
+    
+    // Calculate Day of Year (1-366)
+    const start = new Date(today.getFullYear(), 0, 0);
+    const diff = today - start;
+    const oneDay = 1000 * 60 * 60 * 24;
+    const dayOfYear = Math.floor(diff / oneDay);
+    
+    // Select Question
     const index = dayOfYear % questions.length;
     const dailyQuestion = questions[index];
 
-    // 3. Return the question
-    res.json(dailyQuestion);
+    // 3. Generate Date Strings for UI
+    // "Sunday"
+    const dayName = today.toLocaleDateString('en-US', { weekday: 'long' }); 
+    // "January 31, 2026"
+    const fullDate = today.toLocaleDateString('en-US', { 
+      month: 'long', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+
+    // 4. Return Combined Response
+    // We use .toObject() to convert Mongoose doc to plain object so we can add custom fields
+    res.json({
+      ...dailyQuestion.toObject(),
+      day: dayName,      // UI: "Sunday"
+      date: fullDate     // UI: "January 31, 2026"
+    });
+
   } catch (err) {
     console.error("Error in getDailyQuestion:", err);
     res.status(500).json({ error: "Server Error fetching QOTD" });
