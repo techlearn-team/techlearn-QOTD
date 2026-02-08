@@ -2,9 +2,6 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import OutputPanel from "./OutputPanel";
 
-// ✅ SINGLE SOURCE OF TRUTH
-const USER_ID = "69876e1b50a617bdce92d4a3";
-
 // ✅ REDUCED LANGUAGES
 const LANGUAGES = ["Python", "Java"];
 
@@ -14,7 +11,7 @@ const TEMPLATES = {
   Java: "// Write your solution here\nclass Solution {\n\n}"
 };
 
-export default function CodeEditor({ question }) {
+export default function CodeEditor({ question, user }) {
   const [language, setLanguage] = useState("Python");
   const [code, setCode] = useState(TEMPLATES.Python);
   const [isRunning, setIsRunning] = useState(false);
@@ -28,6 +25,12 @@ export default function CodeEditor({ question }) {
 
   // ---------------- RUN ----------------
   const handleRunCode = async () => {
+    if (!user) {
+      setOutput({ type: "error", message: "User not authenticated", results: [] });
+      setShowResults(true);
+      return;
+    }
+
     try {
       setIsRunning(true);
       setShowResults(true);
@@ -36,7 +39,7 @@ export default function CodeEditor({ question }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-user-id": USER_ID
+          "x-user-id": user._id
         },
         body: JSON.stringify({
           language,
@@ -75,6 +78,11 @@ export default function CodeEditor({ question }) {
   // ---------------- SUBMIT ----------------
   const handleSubmit = async () => {
     if (submitted) return;
+    if (!user) {
+      setOutput({ type: "error", message: "User not authenticated", results: [] });
+      setShowResults(true);
+      return;
+    }
 
     try {
       setIsRunning(true);
@@ -84,7 +92,7 @@ export default function CodeEditor({ question }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-user-id": USER_ID
+          "x-user-id": user._id
         },
         body: JSON.stringify({
           questionId: question._id,
@@ -152,7 +160,7 @@ export default function CodeEditor({ question }) {
         <div className="p-4 flex gap-3 bg-soft-bg border-t">
           <button
             onClick={handleRunCode}
-            disabled={isRunning}
+            disabled={isRunning || !user}
             className="flex-1 border border-primary text-primary py-2 rounded disabled:opacity-50"
           >
             Run
@@ -160,7 +168,7 @@ export default function CodeEditor({ question }) {
 
           <button
             onClick={handleSubmit}
-            disabled={isRunning || submitted}
+            disabled={isRunning || submitted || !user}
             className="flex-1 bg-primary text-white py-2 rounded disabled:opacity-50"
           >
             {submitted ? "Submitted" : "Submit"}

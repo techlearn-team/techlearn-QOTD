@@ -9,7 +9,7 @@ import SubscribeCTA from "../components/SubscribeCTA";
 import ViewSolution from "../components/ViewSolution";
 import StatsCard from "../components/StatsCard";
 
-export default function QOTD() {
+export default function QOTD({ user, onLogout }) {
   const [question, setQuestion] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -38,7 +38,16 @@ export default function QOTD() {
   }
 
   return (
-    <div className="min-h-screen bg-soft-bg">
+    <div className="min-h-screen bg-soft-bg relative">
+      <div className="absolute top-4 right-4 z-50">
+        <button
+          onClick={onLogout}
+          className="bg-red-50 text-red-600 px-3 py-1 rounded text-sm hover:bg-red-100"
+        >
+          Logout ({user.username})
+        </button>
+      </div>
+
       <Header />
       <Hero />
 
@@ -47,7 +56,7 @@ export default function QOTD() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <CodeEditor question={question} />
+            <CodeEditor question={question} user={user} />
           </div>
 
           <div className="space-y-8">

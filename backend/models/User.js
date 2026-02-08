@@ -16,6 +16,9 @@ const UserSchema = new mongoose.Schema(
     runsUsedToday: { type: Number, default: 0 },
     submittedToday: { type: Boolean, default: false },
 
+    // Security
+    password: { type: String, required: true },
+
     // Lazy Reset (YYYY-MM-DD)
     lastActiveDate: {
       type: String,

@@ -3,21 +3,26 @@ import QOTD from "./pages/QOTD";
 import Login from "./components/Login";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const savedLogin = localStorage.getItem("isLoggedIn");
-    if (savedLogin === "true") {
-      setIsLoggedIn(true);
+    const savedUser = localStorage.getItem("techlearn_user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
     }
   }, []);
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-    localStorage.setItem("isLoggedIn", "true");
+  const handleLogin = (userData) => {
+    setUser(userData);
+    localStorage.setItem("techlearn_user", JSON.stringify(userData));
   };
 
-  return isLoggedIn ? <QOTD /> : <Login onLogin={handleLogin} />;
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem("techlearn_user");
+  };
+
+  return user ? <QOTD user={user} onLogout={handleLogout} /> : <Login onLogin={handleLogin} />;
 }
 
 export default App;
