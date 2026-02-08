@@ -7,9 +7,9 @@ export default function QuestionCard({ question }) {
 
   const metadata = {
     difficulty: question.difficulty || "Easy",
-    topic: "DSA",
-    time: "15–20 min",
-    xp: 20
+    topic: question.topic || "Array",
+    time: question.timeToSolve || "—",
+    xp: question.xp || 0
   };
 
   const getDifficultyColor = (difficulty) => {
@@ -78,19 +78,25 @@ export default function QuestionCard({ question }) {
         </p>
       </div>
 
-      {/* Example */}
+      {/* Examples (FIXED: multiple examples) */}
       <div className="mb-6">
-        <h4 className="text-lg font-semibold mb-3">Example</h4>
-        <div className="bg-soft-bg rounded-xl p-4 border border-border">
-          <div className="font-mono text-sm mb-2">
-            <span className="text-muted">Input:</span>
-            <span className="ml-2">{question.sampleInput}</span>
+        <h4 className="text-lg font-semibold mb-3">Examples</h4>
+
+        {question.examples?.map((example, index) => (
+          <div
+            key={index}
+            className="bg-soft-bg rounded-xl p-4 border border-border mb-3"
+          >
+            <div className="font-mono text-sm mb-2">
+              <span className="text-muted">Input:</span>
+              <span className="ml-2">{example.input}</span>
+            </div>
+            <div className="font-mono text-sm">
+              <span className="text-muted">Output:</span>
+              <span className="ml-2">{example.output}</span>
+            </div>
           </div>
-          <div className="font-mono text-sm">
-            <span className="text-muted">Output:</span>
-            <span className="ml-2">{question.sampleOutput}</span>
-          </div>
-        </div>
+        ))}
       </div>
     </motion.div>
   );
