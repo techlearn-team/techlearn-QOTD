@@ -5,31 +5,18 @@ import OutputPanel from "./OutputPanel";
 // ✅ SINGLE SOURCE OF TRUTH
 const USER_ID = "69876e1b50a617bdce92d4a3";
 
-const LANGUAGES = [
-  "JavaScript",
-  "Python",
-  "Python3",
-  "Java",
-  "C++",
-  "C",
-  "C#",
-  "TypeScript"
-];
+// ✅ REDUCED LANGUAGES
+const LANGUAGES = ["Python", "Java"];
 
+// ✅ REDUCED TEMPLATES
 const TEMPLATES = {
-  JavaScript: "// Write your solution here\nconsole.log('Hello QOTD');",
-  Python: "# Execution simulated\nprint('Hello QOTD')",
-  Python3: "# Execution simulated\nprint('Hello QOTD')",
-  Java: "// Execution simulated\nclass Solution {}",
-  "C++": "// Execution simulated\n#include <bits/stdc++.h>",
-  C: "// Execution simulated\n#include <stdio.h>",
-  "C#": "// Execution simulated\nclass Solution {}",
-  TypeScript: "// Execution simulated\nconsole.log('Hello QOTD');"
+  Python: "# Write your solution here\nprint('Hello QOTD')",
+  Java: "// Write your solution here\nclass Solution {\n\n}"
 };
 
 export default function CodeEditor({ question }) {
-  const [language, setLanguage] = useState("JavaScript");
-  const [code, setCode] = useState(TEMPLATES.JavaScript);
+  const [language, setLanguage] = useState("Python");
+  const [code, setCode] = useState(TEMPLATES.Python);
   const [isRunning, setIsRunning] = useState(false);
   const [output, setOutput] = useState(null);
   const [showResults, setShowResults] = useState(false);
@@ -97,11 +84,11 @@ export default function CodeEditor({ question }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-user-id": USER_ID   // ✅ FIXED
+          "x-user-id": USER_ID
         },
         body: JSON.stringify({
           questionId: question._id,
-          userOutput: question.sampleOutput // mock evaluation
+          userOutput: question.sampleOutput
         })
       });
 
